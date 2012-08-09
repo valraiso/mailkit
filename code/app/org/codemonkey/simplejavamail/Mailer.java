@@ -22,7 +22,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 
-import org.apache.log4j.Logger;
+import play.Logger;
 
 /**
  * Mailing tool aimed for simplicity, for sending e-mails of any complexity. This includes e-mails with plain text and/or html content,
@@ -67,7 +67,6 @@ import org.apache.log4j.Logger;
  */
 public class Mailer {
 
-	private static final Logger logger = Logger.getLogger(Mailer.class);
 	
 	/**
 	 * Encoding used for setting body text, email address, headers, reply-to fields etc. ({@value #CHARACTER_ENCODING}).
@@ -158,7 +157,7 @@ public class Mailer {
 	 */
 	public Session createMailSession(final String host, final Integer port, final String username, final String password) {
 		if (transportStrategy == null) {
-			logger.warn("Transport Strategy not set, using plain SMTP strategy instead!");
+			Logger.warn("Transport Strategy not set, using plain SMTP strategy instead!");
 			transportStrategy = TransportStrategy.SMTP_PLAIN;
 		}
 		Properties props = transportStrategy.generateProperties();
@@ -235,17 +234,17 @@ public class Mailer {
 				final MimeEmailMessageWrapper messageRoot = new MimeEmailMessageWrapper();
 				// fill and send wrapped mime message parts
 				final Message message = prepareMessage(email, messageRoot);
-				logSession(session, transportStrategy);
+				//logSession(session, transportStrategy);
 				message.saveChanges(); // some headers and id's will be set for this specific message
 				Transport transport = session.getTransport();
 				transport.connect();
 				transport.sendMessage(message, message.getAllRecipients());
 				transport.close();
 			} catch (final UnsupportedEncodingException e) {
-				logger.error(e.getMessage(), e);
+				Logger.error(e.getMessage(), e);
 				throw new MailException(String.format(MailException.INVALID_ENCODING, e.getMessage()));
 			} catch (final MessagingException e) {
-				logger.error(e.getMessage(), e);
+				Logger.error(e.getMessage(), e);
 				throw new MailException(String.format(MailException.GENERIC_ERROR, e.getMessage()), e);
 			}
 		}
@@ -257,7 +256,7 @@ public class Mailer {
 	private void logSession(Session session, TransportStrategy transportStrategy) {
 		final String logmsg = "starting mail session (host: %s, port: %s, username: %s, authenticate: %s, transport: %s)";
 		Properties properties = session.getProperties();
-		logger.debug(String.format(logmsg, properties.get(transportStrategy.propertyNameHost()),
+		Logger.debug(String.format(logmsg, properties.get(transportStrategy.propertyNameHost()),
 				properties.get(transportStrategy.propertyNamePort()), properties.get(transportStrategy.propertyNameUsername()),
 				properties.get(transportStrategy.propertyNameAuthenticate()), transportStrategy));
 	}
@@ -282,16 +281,16 @@ public class Mailer {
 			throw new MailException(MailException.MISSING_SENDER);
 		} else {
 			if (!EmailValidationUtil.isValid(email.getFromRecipient().getAddress(), emailAddressValidationCriteria)) {
-				throw new MailException(String.format(MailException.INVALID_SENDER, email));
+				throw new MailException(String.format(MailException.INVALID_SENDER, email.getFromRecipient ().toString ()));
 			}
 			for (final Recipient recipient : email.getRecipients()) {
 				if (!EmailValidationUtil.isValid(recipient.getAddress(), emailAddressValidationCriteria)) {
-					throw new MailException(String.format(MailException.INVALID_RECIPIENT, email));
+					throw new MailException(String.format(MailException.INVALID_RECIPIENT, recipient.toString ()));
 				}
 			}
 			if (email.getReplyToRecipient() != null) {
 				if (!EmailValidationUtil.isValid(email.getReplyToRecipient().getAddress(), emailAddressValidationCriteria)) {
-					throw new MailException(String.format(MailException.INVALID_REPLYTO, email));
+					throw new MailException(String.format(MailException.INVALID_REPLYTO, email.getReplyToRecipient ().toString () ));
 				}
 			}
 		}
@@ -454,7 +453,7 @@ public class Mailer {
 		attachmentPart.setDataHandler(new DataHandler(resource.getDataSource()));
 		attachmentPart.setFileName(resource.getName());
 		attachmentPart.setHeader("Content-Type", ds.getContentType() + "; filename=" + ds.getName() + "; name=" + ds.getName());
-		attachmentPart.setHeader("Content-ID", String.format("<%s>", ds.getName()));
+		attachmentPart.setHeader("Content-ID", String.format("<%s>", resource.getName () ));
 		attachmentPart.setDisposition(dispositionType + "; size=0");
 		return attachmentPart;
 	}
@@ -501,7 +500,7 @@ public class Mailer {
 				multipartRelated.addBodyPart(contentAlternativeMessages);
 				contentAlternativeMessages.setContent(multipartAlternativeMessages);
 			} catch (final MessagingException e) {
-				logger.error(e.getMessage(), e);
+				Logger.error(e.getMessage(), e);
 				throw new RuntimeException(e.getMessage(), e);
 			}
 		}

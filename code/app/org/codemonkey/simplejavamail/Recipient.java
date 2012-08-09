@@ -49,4 +49,15 @@ public final class Recipient {
 	public RecipientType getType() {
 		return type;
 	}
+
+	@Override
+	public String toString() {
+		if (name != null){
+			return  name + " <" + address + ">";
+		} else {
+			return address;
+		}
+	}
+	
+	
 }

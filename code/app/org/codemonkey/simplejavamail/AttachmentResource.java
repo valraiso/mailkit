@@ -9,7 +9,7 @@ import javax.activation.DataSource;
  * @author Benny Bottema
  * @see DataSource
  */
-final class AttachmentResource {
+public final class AttachmentResource {
 
 	/**
 	 * @see #AttachmentResource(String, DataSource)
@@ -47,4 +47,11 @@ final class AttachmentResource {
 	public String getName() {
 		return name;
 	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+	
+	
 }

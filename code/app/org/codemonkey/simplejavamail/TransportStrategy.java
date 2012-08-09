@@ -195,4 +195,4 @@ public enum TransportStrategy {
 	abstract String propertyNameUsername();
 
 	abstract String propertyNameAuthenticate();
-};
+}
