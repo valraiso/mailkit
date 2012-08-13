@@ -3,6 +3,7 @@ package simplemailer;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -26,7 +27,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+
 import play.api.libs.MimeTypes;
+import play.api.mvc.Request;
 import play.api.templates.Html;
 import play.api.templates.Txt;
 import play.mvc.Call;
@@ -47,12 +50,17 @@ public class Email {
 	/**
 	 * Is this email will interpret and automatically inline CSS to html email text
 	 */
-	public boolean interpretCss = true;
+	private boolean interpretCss = true;
 	
 	/**
 	 * Is this email will embed external images 
 	 */
-	public boolean embedImages  = false;
+	private boolean embedImages  = false;
+	
+	/**
+	 * Current host
+	 */
+	private String host;
 	
 	/**
 	 * The priority of Email. For HIGH and LOW priority, a X-Priority header will be added.
@@ -88,12 +96,24 @@ public class Email {
 	}
 	
 	/**
-	 * Bean setter for {@link #embedImages}.
+	 * Bean setter for {@link #embedImages}.use this method in Java
 	 * @param boolean
 	 * @return this
 	 */
 	public Email setEmbedImages(boolean embedImages){
 		this.embedImages = embedImages;
+		return this;
+	}
+	
+	/**
+	 * Bean setter for {@link #embedImages}.use this method in Scala
+	 * @param boolean
+	 * @param host : full host : example https://google.fr
+	 * @return this
+	 */
+	public Email setEmbedImages(boolean embedImages, String host){
+		this.embedImages = embedImages;
+		this.host = host;
 		return this;
 	}
 	
@@ -155,7 +175,7 @@ public class Email {
 	 * @param String[]
 	 * @return this 
 	 * */
-	public Email to(String... addresses){
+	public Email tos(String... addresses){
 		
 		if (addresses != null){
 			for (String address : addresses){
@@ -175,13 +195,22 @@ public class Email {
 		email.addRecipient(name, address, RecipientType.TO);
 		return this;
 	}
+	/**
+	 * Add a to recipient
+	 * @param name: The recipient name .
+	 * @param address: The recipient email address .
+	 * @return this
+	 */
+	public Email to(String address){
+		return to ( address , "" );
+	}
 	
 	/**
 	 * Add array of cc recipient
 	 * @param String[]
 	 * @return this 
 	 * */
-	public Email cc(String... addresses){
+	public Email ccs(String... addresses){
 		
 		if (addresses != null){
 			for (String address : addresses){
@@ -190,6 +219,16 @@ public class Email {
 		}
 
 		return this;
+	}
+	
+	/**
+	 * Add a cc recipient
+	 * @param name: The recipient name .
+	 * @param address: The recipient email address .
+	 * @return this
+	 */
+	public Email cc(String address){
+		return cc ( address , "");
 	}
 	
 	/**
@@ -208,7 +247,7 @@ public class Email {
 	 * @param String[]
 	 * @return this 
 	 * */
-	public Email bcc(String... addresses){
+	public Email bccs(String... addresses){
 		
 		if (addresses != null){
 			for (String address : addresses){
@@ -219,6 +258,15 @@ public class Email {
 		return this;
 	}
 	
+	/**
+	 * Add a bcc recipient
+	 * @param name: The recipient name .
+	 * @param address: The recipient email address .
+	 * @return this
+	 */
+	public Email bcc(String address){
+		return bcc( address , "");
+	}
 	/**
 	 * Add a bcc recipient
 	 * @param name: The recipient name .
@@ -254,6 +302,44 @@ public class Email {
 		}
 		
 		return this;
+	}
+	
+	/**
+	 * Add an attachment
+	 * @param String url
+	 */
+	public Email attach (String url){
+		if ( url != null ){
+			try {
+				String filename = url.lastIndexOf ( "/" ) > 0 ? url.substring ( url.lastIndexOf ( "/" ) +1 ) : url;
+				URL u = new URL ( url );
+				return attach( u.openStream () , filename );
+			}
+			catch( IOException e ) {
+				e.printStackTrace();
+			} 
+		}
+		return this;
+	}
+	
+	/**
+	 * Add an attachment
+	 * @param is
+	 * @param attachmentName
+	 * @return
+	 */
+	public Email attach ( InputStream is , String attachmentName ){
+		if (is != null){
+			try {
+				ByteArrayDataSource bads = NamedByteArrayDataSource.get ( is, attachmentName );
+				email.addAttachment ( attachmentName, bads);
+			}
+			catch( IOException e ) {
+				e.printStackTrace();
+			}
+		}
+		return this;
+		
 	}
 	
 	/**
@@ -425,8 +511,12 @@ public class Email {
 		while (imagesMatch.find()){
 			String src = imagesMatch.group(2);
 			if (!src.startsWith ( "http" ) ){
-				Call call =  new play.api.mvc.Call("GET", src ) ;
-				src = call.absoluteURL ( Http.Context.current ().request () );
+				if (host != null){
+					src = host + src;
+				}
+				else {
+					src = "http://"+ Http.Context.current ().request ().host () + src;
+				}
 			}
 			
 			String replacement = "";
@@ -438,10 +528,16 @@ public class Email {
 				imagesMatch.appendReplacement( result , replacement);
 			}
 			else {
-				embedOne ( src, cid );
-				replacement = imagesMatch.group(1) + "src=\"cid:" + cid + "\"" + imagesMatch.group(3);
-				imagesMatch.appendReplacement( result , replacement);
-				cids.add ( cid );
+				try{
+					embedOne ( src, cid );
+					replacement = imagesMatch.group(1) + "src=\"cid:" + cid + "\"" + imagesMatch.group(3);
+					imagesMatch.appendReplacement( result , replacement);
+					cids.add ( cid );
+				}
+				catch (IOException e) {
+					System.err.printf ("Failed while reading bytes from %s: %s", src, e.getMessage());
+					e.printStackTrace ();
+				}
 			}
 		}
 		imagesMatch.appendTail(result);
@@ -452,8 +548,9 @@ public class Email {
 	 * Embed one image as cid
 	 * @param src
 	 * @param cid
+	 * @throws Exception 
 	 */
-	public void embedOne(String src, String cid){
+	private void embedOne(String src, String cid) throws IOException{
 		InputStream is = null;
 		URL url = null;
 		String filename = src.lastIndexOf ( "/" ) > 0 ? src.substring (  src.lastIndexOf ( "/" ) +1 ) : src;
@@ -462,20 +559,16 @@ public class Email {
 			is = url.openStream ();
 			email.addEmbeddedImage ( cid , NamedByteArrayDataSource.get ( is,  filename ) );
 		}
-		catch (IOException e) {
-			  System.err.printf ("Failed while reading bytes from %s: %s", url.toExternalForm(), e.getMessage());
-			  e.printStackTrace ();
-			}
-			finally {
-				if (is != null) { 
-					try {
-						is.close();
-					}
-					catch( IOException e ) {
-						e.printStackTrace();
-					}
+		finally {
+			if (is != null) { 
+				try {
+					is.close();
+				}
+				catch( IOException e ) {
+					e.printStackTrace();
 				}
 			}
+		}
 		
 	}
 	
@@ -533,6 +626,10 @@ public class Email {
 			sb.append ( "[Attachement] " ).append(  Email.join ( email.getAttachments (), " , " ) ).append ( newline );
 		}
 		
+		if ( email.getEmbeddedImages () != null && ! email.getEmbeddedImages ().isEmpty () ) {
+			sb.append ( "[Embedded images] " ).append(  Email.join ( email.getEmbeddedImages (), " , " ) ).append ( newline );
+		} 
+		
 		sb.append(newline);
 		
 		if ( email.getText () != null && ! email.getText ().isEmpty () ){
@@ -564,6 +661,11 @@ public class Email {
 		return sb.toString ();
 	}
 	
+	/**
+	 * Hash f
+	 * @param input
+	 * @return
+	 */
 	private static String cidHash( String input ) {
 		try {
 			MessageDigest m = MessageDigest.getInstance ( "MD5" );

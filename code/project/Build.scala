@@ -11,7 +11,6 @@ object ApplicationBuild extends Build {
     	"javax.activation" % "activation" % "1.1-rev-1",
     	"javax.mail" % "mailapi" % "1.4.3",
     	"com.sun.mail" % "smtp" % "1.4.4",
-    	"log4j" % "log4j" % "1.2.17",
       	"org.jsoup" % "jsoup" % "1.6.3"
     )
 
