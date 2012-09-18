@@ -5,7 +5,7 @@ import PlayProject._
 object ApplicationBuild extends Build {
 
     val appName         = "izMailer"
-    val appVersion      = "2.1-SNAPSHOT"
+    val appVersion      = "1.0-SNAPSHOT"
 
     val appDependencies = Seq(
     	"javax.activation" % "activation" % "1.1-rev-1",
@@ -14,9 +14,16 @@ object ApplicationBuild extends Build {
       "org.jsoup" % "jsoup" % "1.6.3"
     )
 
+    val valraisoReleases   = Resolver.file("file", new File(Path.userHome.absolutePath+"/dev/apps/valraiso.github.com/releases/"))
+    val valraisoSnapshots  = Resolver.file("file", new File(Path.userHome.absolutePath+"/dev/apps/valraiso.github.com/snapshot/"))
+    val valraisoRepository = if(appVersion.endsWith("SNAPSHOT")) valraisoSnapshots else valraisoReleases
+
+
     val main = PlayProject(appName, appVersion, appDependencies, mainLang = JAVA).settings(
-      organization := "valraiso",
-      playPlugin := true 
+        organization := "valraiso",
+        playPlugin := true,
+        publishMavenStyle := true,
+        publishTo := Some(valraisoRepository)
     )
 
 }
