@@ -23,7 +23,7 @@ mail.smtp.channel=String (SMTP transport strategy, values are ssl,tls,plain. def
 
 <b>2.</b> As usual, you can specify TOs, CCs, BCCs, REPLYTO addresses.
 For each recipient, you can specify a name .
-<pre><code>IzMail email =new IzMail ();
+<pre><code>IzMail email = new IzMail ();
 email.from ( "from@from.fr", "from" );
 email.replyTo ( "replyto@replyto.fr", "replyto" );
 email.to ( "to1@to1.fr", "to1" );
@@ -35,7 +35,7 @@ email.subject ( "simplemail" ).textAndHtml ( "Simple test" ).send ();
 
 <b>3.</b> Setting html content will automatically inline css directives.
 For example, this implementation:
-<pre><code>IzMail email =new IzMail ();
+<pre><code>IzMail email = new IzMail ();
 email.from ( "from@from.fr", "from" );
 email.replyTo ( "replyto@replyto.fr", "replyto" );
 email.to ( "to1@to1.fr", "to1" );
