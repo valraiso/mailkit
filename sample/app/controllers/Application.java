@@ -2,13 +2,13 @@ package controllers;
 
 import play.mvc.Controller;
 import play.mvc.Result;
-import simplemailer.Email;
+import izmailer.IzMail;
 
 public class Application extends Controller {
   
   public static Result index() throws Exception {
 	  
-	  Email email = new Email ();
+	  IzMail email = new IzMail ();
 	  email.from ( "benoit.glevarec@from.fr" );
 	  email.to ( "to@to.fr" );
 	  email.subject ( "simplemail" );

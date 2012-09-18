@@ -1,4 +1,4 @@
-package simplemailer;
+package izmailer;
 
 import org.codemonkey.simplejavamail.MailException;
 import org.codemonkey.simplejavamail.TransportStrategy;
@@ -82,15 +82,15 @@ public class Mailer {
 	 * @param email
 	 * @throws MailException
 	 */
-	public void sendMail(Email email) throws MailException {
+	public void sendMail(IzMail izMail) throws MailException {
 		
-		if (email.email.getFromRecipient() == null && defaultSender != null){
-			email.email.setFromAddress(defaultSender._1, defaultSender._2);
+		if (izMail.email.getFromRecipient() == null && defaultSender != null){
+			izMail.email.setFromAddress(defaultSender._1, defaultSender._2);
 		}
-		if (mockMode && mailer.validate ( email.email )){
-			Logger.info ( email.toString() );
+		if (mockMode && mailer.validate ( izMail.email )){
+			Logger.info ( izMail.toString() );
 		} else {
-			mailer.sendMail(email.email);
+			mailer.sendMail(izMail.email);
 		}
 	}
 	
@@ -100,8 +100,8 @@ public class Mailer {
 	 * @return
 	 * @throws MailException
 	 */
-	public boolean validate(Email email) throws MailException {
+	public boolean validate(IzMail izMail) throws MailException {
 		
-		return mailer.validate(email.email);
+		return mailer.validate(izMail.email);
 	}
 }

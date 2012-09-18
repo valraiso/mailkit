@@ -1,12 +1,12 @@
 package controllers
 
 import play.api.mvc._
-import simplemailer.Email
+import izmailer.IzMail
 
 object ScalaController extends Controller {
 
   def index = Action {implicit request =>
-  	  val email = new Email ();
+  	  val email = new IzMail ();
 	  email.from ( "from@from.fr" );
 	  email.to ( "to@to.fr" );
 	  email.subject ( "simplemail" );
