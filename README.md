@@ -1,4 +1,4 @@
-<h1>Mailkit : Mailer for Playframework 2.x</h1>
+<h1>mailkit : Mailer for Playframework 2.x</h1>
 <i>Status RC-1</i>
 
 <h2>About</h2>
