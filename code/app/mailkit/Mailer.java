@@ -1,4 +1,4 @@
-package izmailer;
+package mailkit;
 
 import org.codemonkey.simplejavamail.MailException;
 import org.codemonkey.simplejavamail.TransportStrategy;
@@ -25,7 +25,7 @@ public class Mailer {
 	 * 		mail.smtp.mock		-> Is this mailer will send real mail or just log it
 	 *		mail.smtp.host		-> SMTP server mail host, for example mail.google.com
 	 * 		mail.smtp.port		-> SMTP server port, default : 25
-	 *		mail.smtp.user		-> SMTP user email, optional
+	 *		mail.smtp.user		-> SMTP user simpleMail, optional
 	 *		mail.smtp.pass		-> SMTP user password, optional
 	 *		mail.smtp.channel	-> SMTP transport strategy, values are ssl,tls,plain. default :plain 
 	 */
@@ -44,10 +44,10 @@ public class Mailer {
 			mockMode = true;
 		}
 		
-		String  host = mockMode ? "localhost" : config.getString("mail.smtp.host");
-		Integer port = mockMode ? 993 :  ( config.getInt   ("mail.smtp.port") == null ? 25 : config.getInt   ("mail.smtp.port") );
+		String  host = mockMode ? "localhost"     : config.getString("mail.smtp.host");
+		Integer port = mockMode ? 993             : config.getInt   ("mail.smtp.port") == null ? 25 : config.getInt("mail.smtp.port");
 		String  user = mockMode ? "mock@mock.com" : config.getString("mail.smtp.user");
-		String  pass = mockMode ? "mock" : config.getString("mail.smtp.pass");
+		String  pass = mockMode ? "mock"          : config.getString("mail.smtp.pass");
 
 		String  channel =  mockMode ? "ssl" : config.getString("mail.smtp.channel");
 
@@ -78,30 +78,30 @@ public class Mailer {
 	}
 	
 	/**
-	 * Send an email
+	 * Send an simpleMail
 	 * @param email
 	 * @throws MailException
 	 */
-	public void sendMail(IzMail izMail) throws MailException {
+	public void sendMail(Email email) throws MailException {
 		
-		if (izMail.email.getFromRecipient() == null && defaultSender != null){
-			izMail.email.setFromAddress(defaultSender._1, defaultSender._2);
+		if (email.simpleMail.getFromRecipient() == null && defaultSender != null){
+			email.simpleMail.setFromAddress(defaultSender._1, defaultSender._2);
 		}
-		if (mockMode && mailer.validate ( izMail.email )){
-			Logger.info ( izMail.toString() );
+		if (mockMode && mailer.validate ( email.simpleMail)){
+			Logger.info ( email.toString() );
 		} else {
-			mailer.sendMail(izMail.email);
+			mailer.sendMail(email.simpleMail);
 		}
 	}
 	
 	/**
-	 * Validate an email, Validation fails if the subject is missing, content is missing, or no recipients are defined, or if a recipient address is malformed
+	 * Validate an simpleMail, Validation fails if the subject is missing, content is missing, or no recipients are defined, or if a recipient address is malformed
 	 * @param email
 	 * @return
 	 * @throws MailException
 	 */
-	public boolean validate(IzMail izMail) throws MailException {
+	public boolean validate(Email email) throws MailException {
 		
-		return mailer.validate(izMail.email);
+		return mailer.validate(email.simpleMail);
 	}
 }

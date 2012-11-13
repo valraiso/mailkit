@@ -19,7 +19,7 @@ public final class Recipient {
 	 * Constructor; initializes this recipient object.
 	 * 
 	 * @param name The name of the recipient.
-	 * @param address The email address of the recipient.
+	 * @param address The simpleMail address of the recipient.
 	 * @param type The recipient type (eg. {@link RecipientType#TO}).
 	 * @see RecipientType
 	 */

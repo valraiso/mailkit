@@ -1,14 +1,14 @@
 package controllers;
 
+import mailkit.Email;
 import play.mvc.Controller;
 import play.mvc.Result;
-import izmailer.IzMail;
 
 public class Application extends Controller {
   
   public static Result index() throws Exception {
 	  
-	  IzMail email = new IzMail ();
+	  Email email = new Email();
 	  email.from ( "benoit.glevarec@from.fr" );
 	  email.to ( "to@to.fr" );
 	  email.subject ( "simplemail" );

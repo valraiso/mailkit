@@ -11,7 +11,7 @@ package org.codemonkey.simplejavamail;
 import java.util.regex.Pattern;
 
 /**
- * Validates an email address according to <a href="http://www.ietf.org/rfc/rfc2822.txt">RFC 2822</a>, using regular expressions.
+ * Validates an simpleMail address according to <a href="http://www.ietf.org/rfc/rfc2822.txt">RFC 2822</a>, using regular expressions.
  * <p>
  * From the original author: <br />
  * <blockquote> If you use this code, please keep the author information in tact and reference my site at <a
@@ -35,7 +35,7 @@ public final class EmailValidationUtil {
 	 * Validates an e-mail with default validation flags that remains <code>true</code> to RFC 2822. This means allowing both domain
 	 * literals and quoted identifiers.
 	 * 
-	 * @param email A complete email address.
+	 * @param email A complete simpleMail address.
 	 * @return Whether the e-mail address is compliant with RFC 2822.
 	 * @see EmailAddressValidationCriteria#EmailAddressValidationCriteria(boolean, boolean)
 	 */
@@ -46,7 +46,7 @@ public final class EmailValidationUtil {
 	/**
 	 * Validates an e-mail with given validation flags.
 	 * 
-	 * @param email A complete email address.
+	 * @param email A complete simpleMail address.
 	 * @param emailAddressValidationCriteria A set of flags that restrict or relax RFC 2822 compliance.
 	 * @return Whether the e-mail address is compliant with RFC 2822, configured using the passed in {@link EmailAddressValidationCriteria}.
 	 * @see EmailAddressValidationCriteria#EmailAddressValidationCriteria(boolean, boolean)

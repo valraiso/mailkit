@@ -1,9 +1,8 @@
-package izmailer;
+package mailkit;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -22,7 +21,6 @@ import javax.mail.util.ByteArrayDataSource;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.codemonkey.simplejavamail.Recipient;
-import org.codemonkey.simplejavamail.Email;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,14 +28,12 @@ import org.jsoup.select.Elements;
 
 
 import play.api.libs.MimeTypes;
-import play.api.mvc.Request;
 import play.api.templates.Html;
 import play.api.templates.Txt;
-import play.mvc.Call;
 import play.mvc.Http;
 import scala.Option;
 
-public class IzMail {
+public class Email {
 
 	private static final String newline = System.getProperty("line.separator");
 	private static final Pattern imgTag = Pattern.compile("(?i)(<img.*?)src=\"(.*?)\"(.*?>)");
@@ -46,15 +42,15 @@ public class IzMail {
 	 * org.codemonkey.simplejavamailEmail
 	 * Email message with all necessary data for an effective mailing action, including attachments etc.
 	 */
-	public Email email;
+	public org.codemonkey.simplejavamail.Email simpleMail;
 	
 	/**
-	 * Is this email will interpret and automatically inline CSS to html email text
+	 * Is this simpleMail will interpret and automatically inline CSS to html simpleMail text
 	 */
 	private boolean interpretCss = true;
 	
 	/**
-	 * Is this email will embed external images 
+	 * Is this simpleMail will embed external images
 	 */
 	private boolean embedImages  = false;
 	
@@ -80,10 +76,10 @@ public class IzMail {
 	}
 	
 	/**
-	 * Instantiate new email object
+	 * Instantiate new simpleMail object
 	 */
-	public IzMail() {
-		email = new Email();
+	public Email() {
+		simpleMail = new org.codemonkey.simplejavamail.Email();
 	}
 
 	/**
@@ -91,7 +87,7 @@ public class IzMail {
 	 * @param boolean
 	 * @return this
 	 */
-	public IzMail setInterpretCss(boolean interpretCss){
+	public Email setInterpretCss(boolean interpretCss){
 		this.interpretCss = interpretCss;
 		return this;
 	}
@@ -101,7 +97,7 @@ public class IzMail {
 	 * @param boolean
 	 * @return this
 	 */
-	public IzMail setEmbedImages(boolean embedImages){
+	public Email setEmbedImages(boolean embedImages){
 		this.embedImages = embedImages;
 		return this;
 	}
@@ -112,7 +108,7 @@ public class IzMail {
 	 * @param host : full host : example https://google.fr
 	 * @return this
 	 */
-	public IzMail setEmbedImages(boolean embedImages, String host){
+	public Email setEmbedImages(boolean embedImages, String host){
 		this.embedImages = embedImages;
 		this.host = host;
 		return this;
@@ -124,7 +120,7 @@ public class IzMail {
 	 * @param EmailPriority
 	 * @return this
 	 */
-	public IzMail setPriority(EmailPriority priority){
+	public Email setPriority(EmailPriority priority){
 		if (priority != null){
 			this.priority = priority;
 		}
@@ -132,42 +128,42 @@ public class IzMail {
 	}
 	
 	/**
-	 * Set the sender of the email
-	 * @param : The sender email address.
+	 * Set the sender of the simpleMail
+	 * @param : The sender simpleMail address.
 	 * @return this
 	 */
-	public IzMail from(String address){
+	public Email from(String address){
 		return from(address, "");
 	}
 	
 	/** 
-	 * Set the sender of the email
+	 * Set the sender of the simpleMail
 	 * @param name: The sender name .
-	 * @param address: The sender email address .
+	 * @param address: The sender simpleMail address .
 	 * @return this
 	 */
-	public IzMail from(String address, String name){
-		email.setFromAddress(name, address);
+	public Email from(String address, String name){
+		simpleMail.setFromAddress(name, address);
 		return this;
 	}
 	
 	/**
-	 * Set the replyTo of the email
-	 * @param : The replyTo email address.
+	 * Set the replyTo of the simpleMail
+	 * @param : The replyTo simpleMail address.
 	 * @return this
 	 */
-	public IzMail replyTo(String address){
+	public Email replyTo(String address){
 		return replyTo(address, "");
 	}
 	
 	/** 
-	 * Set the replyTo of the email
+	 * Set the replyTo of the simpleMail
 	 * @param name: The replyTo name .
-	 * @param address: The replyTo email address .
+	 * @param address: The replyTo simpleMail address .
 	 * @return this
 	 */
-	public IzMail replyTo(String address, String name){
-		email.setReplyToAddress(name, address);
+	public Email replyTo(String address, String name){
+		simpleMail.setReplyToAddress(name, address);
 		return this;
 	}
 	
@@ -176,7 +172,7 @@ public class IzMail {
 	 * @param String[]
 	 * @return this 
 	 * */
-	public IzMail tos(String... addresses){
+	public Email tos(String... addresses){
 		
 		if (addresses != null){
 			for (String address : addresses){
@@ -189,20 +185,20 @@ public class IzMail {
 	/**
 	 * Add a to recipient
 	 * @param name: The recipient name .
-	 * @param address: The recipient email address .
+	 * @param address: The recipient simpleMail address .
 	 * @return this
 	 */
-	public IzMail to(String address, String name){
-		email.addRecipient(name, address, RecipientType.TO);
+	public Email to(String address, String name){
+		simpleMail.addRecipient(name, address, RecipientType.TO);
 		return this;
 	}
 	/**
 	 * Add a to recipient
 	 * @param name: The recipient name .
-	 * @param address: The recipient email address .
+	 * @param address: The recipient simpleMail address .
 	 * @return this
 	 */
-	public IzMail to(String address){
+	public Email to(String address){
 		return to ( address , "" );
 	}
 	
@@ -211,7 +207,7 @@ public class IzMail {
 	 * @param String[]
 	 * @return this 
 	 * */
-	public IzMail ccs(String... addresses){
+	public Email ccs(String... addresses){
 		
 		if (addresses != null){
 			for (String address : addresses){
@@ -225,21 +221,21 @@ public class IzMail {
 	/**
 	 * Add a cc recipient
 	 * @param name: The recipient name .
-	 * @param address: The recipient email address .
+	 * @param address: The recipient simpleMail address .
 	 * @return this
 	 */
-	public IzMail cc(String address){
+	public Email cc(String address){
 		return cc ( address , "");
 	}
 	
 	/**
 	 * Add a cc recipient
 	 * @param name: The recipient name .
-	 * @param address: The recipient email address .
+	 * @param address: The recipient simpleMail address .
 	 * @return this
 	 */
-	public IzMail cc(String address, String name){
-		email.addRecipient(name, address, RecipientType.CC);
+	public Email cc(String address, String name){
+		simpleMail.addRecipient(name, address, RecipientType.CC);
 		return this;
 	}
 	
@@ -248,7 +244,7 @@ public class IzMail {
 	 * @param String[]
 	 * @return this 
 	 * */
-	public IzMail bccs(String... addresses){
+	public Email bccs(String... addresses){
 		
 		if (addresses != null){
 			for (String address : addresses){
@@ -262,20 +258,20 @@ public class IzMail {
 	/**
 	 * Add a bcc recipient
 	 * @param name: The recipient name .
-	 * @param address: The recipient email address .
+	 * @param address: The recipient simpleMail address .
 	 * @return this
 	 */
-	public IzMail bcc(String address){
+	public Email bcc(String address){
 		return bcc( address , "");
 	}
 	/**
 	 * Add a bcc recipient
 	 * @param name: The recipient name .
-	 * @param address: The recipient email address .
+	 * @param address: The recipient simpleMail address .
 	 * @return this
 	 */
-	public IzMail bcc(String address, String name){
-		email.addRecipient(name, address, RecipientType.BCC);
+	public Email bcc(String address, String name){
+		simpleMail.addRecipient(name, address, RecipientType.BCC);
 		return this;
 	}
 	
@@ -283,7 +279,7 @@ public class IzMail {
 	 * Add an attachment
 	 * @param File
 	 */
-	public IzMail attach(File attachment){
+	public Email attach(File attachment){
 		if (attachment != null){
 			return attach( attachment , attachment.getName () );
 		}
@@ -295,11 +291,11 @@ public class IzMail {
 	 * @param File
 	 * @param String filename
 	 */
-	public IzMail attach( File attachment , String fileName){
+	public Email attach( File attachment , String fileName){
 		
 		if ( attachment != null ){
 			FileDataSource datasource = new FileDataSource ( attachment );
-			email.addAttachment ( fileName , datasource );
+			simpleMail.addAttachment(fileName, datasource);
 		}
 		
 		return this;
@@ -309,7 +305,7 @@ public class IzMail {
 	 * Add an attachment
 	 * @param String url
 	 */
-	public IzMail attach (String url){
+	public Email attach (String url){
 		if ( url != null ){
 			try {
 				String filename = url.lastIndexOf ( "/" ) > 0 ? url.substring ( url.lastIndexOf ( "/" ) +1 ) : url;
@@ -329,11 +325,11 @@ public class IzMail {
 	 * @param attachmentName
 	 * @return
 	 */
-	public IzMail attach ( InputStream is , String attachmentName ){
+	public Email attach ( InputStream is , String attachmentName ){
 		if (is != null){
 			try {
 				ByteArrayDataSource bads = NamedByteArrayDataSource.get ( is, attachmentName );
-				email.addAttachment ( attachmentName, bads);
+				simpleMail.addAttachment(attachmentName, bads);
 			}
 			catch( IOException e ) {
 				e.printStackTrace();
@@ -348,8 +344,8 @@ public class IzMail {
 	 * @param String
 	 * @return this
 	 */
-	public IzMail subject(String subject){
-		email.setSubject(subject);
+	public Email subject(String subject){
+		simpleMail.setSubject(subject);
 		return this;
 	}
 	
@@ -358,8 +354,8 @@ public class IzMail {
 	 * @param String
 	 * @return this
 	 */
-	public IzMail text(String text){
-		email.setText(text);
+	public Email text(String text){
+		simpleMail.setText(text);
 		return this;
 	}
 	
@@ -368,7 +364,7 @@ public class IzMail {
 	 * @param Txt
 	 * @return this
 	 */
-	public IzMail text(Txt template){
+	public Email text(Txt template){
 		return text(template.body());
 	}
 	
@@ -377,7 +373,7 @@ public class IzMail {
 	 * @param String
 	 * @return this
 	 */
-	public IzMail html(String html){
+	public Email html(String html){
 		if (interpretCss){
 			html = inlineCss(html);
 		}
@@ -386,7 +382,7 @@ public class IzMail {
 		}
 		
 		
-		email.setTextHTML(html);
+		simpleMail.setTextHTML(html);
 		return this;
 	}
 	
@@ -395,18 +391,18 @@ public class IzMail {
 	 * @param Html
 	 * @return this
 	 */
-	public IzMail html(Html template){
+	public Email html(Html template){
 		
 		return html ( template.body() );
 	}
 	
 	/**
 	 * Set at once Html and text :
-	 * The Html will be cleaned and inject into email text
+	 * The Html will be cleaned and inject into simpleMail text
 	 * @param String
 	 * @return this
 	 */
-	public IzMail textAndHtml(String html){
+	public Email textAndHtml(String html){
 		
 		html(html);
 		
@@ -418,20 +414,20 @@ public class IzMail {
 	
 	/**
 	 * Set at once Html and text :
-	 * The Html will be cleaned and inject into email text
+	 * The Html will be cleaned and inject into simpleMail text
 	 * @param Html
 	 * @return this
 	 */
-	public IzMail textAndHtml(Html template){
+	public Email textAndHtml(Html template){
 		return textAndHtml(template.body());
 	}
 	
 	/**
-	 * Send this email
+	 * Send this simpleMail
 	 */
 	public void send(){
 		if (!EmailPriority.NORMAL.equals(this.priority)){
-			email.addHeader("X-Priority", this.priority.val());
+			simpleMail.addHeader("X-Priority", this.priority.val());
 		}
 		
 		Mailer.instance().sendMail(	this );
@@ -558,7 +554,7 @@ public class IzMail {
 		try	{
 			url = new URL(src);
 			is = url.openStream ();
-			email.addEmbeddedImage ( cid , NamedByteArrayDataSource.get ( is,  filename ) );
+			simpleMail.addEmbeddedImage(cid, NamedByteArrayDataSource.get(is, filename));
 		}
 		finally {
 			if (is != null) { 
@@ -583,20 +579,20 @@ public class IzMail {
 		sb.append("Send mail as mock");
 		sb.append(newline).append(newline);
 		
-		if (email.getFromRecipient() != null){
-			sb.append("[from]    ").append ( email.getFromRecipient().toString ()  );
+		if (simpleMail.getFromRecipient() != null){
+			sb.append("[from]    ").append ( simpleMail.getFromRecipient().toString ()  );
 			sb.append(newline);
 		}
-		if (email.getReplyToRecipient () != null){
-			sb.append("[ReplyTo] ").append ( email.getReplyToRecipient ().toString () );
+		if (simpleMail.getReplyToRecipient () != null){
+			sb.append("[ReplyTo] ").append ( simpleMail.getReplyToRecipient ().toString () );
 			sb.append(newline);
 		}
-		if (email.getRecipients () != null){
+		if (simpleMail.getRecipients () != null){
 			List<Recipient> tos 	= new ArrayList<Recipient> ();
 			List<Recipient> ccs 	= new ArrayList<Recipient> ();
 			List<Recipient> bccs 	= new ArrayList<Recipient> ();
 				
-			for (Recipient recipient : email.getRecipients ()){
+			for (Recipient recipient : simpleMail.getRecipients ()){
 				if ( RecipientType.TO.equals ( recipient.getType () ) ){
 					tos.add ( recipient );
 				}
@@ -608,36 +604,36 @@ public class IzMail {
 				}
 			}
 			if ( ! tos.isEmpty () ){
-				sb.append ( "[to]      " ).append( IzMail.join ( tos , " , " ) ).append ( newline );
+				sb.append ( "[to]      " ).append( Email.join(tos, " , ") ).append(newline);
 			}
 			if ( ! ccs.isEmpty () ){
-				sb.append ( "[cc]      " ).append(  IzMail.join ( ccs, " , " ) ).append ( newline );
+				sb.append ( "[cc]      " ).append(  Email.join(ccs, " , ") ).append(newline);
 			}
 			if ( ! bccs.isEmpty () ){
-				sb.append ( "[bcc]     " ).append(  IzMail.join ( bccs, " , " ) ).append ( newline );
+				sb.append ( "[bcc]     " ).append(  Email.join(bccs, " , ") ).append(newline);
 			}
 			sb.append ( newline );
 		}
 		
-		if ( email.getSubject () != null && ! email.getSubject ().isEmpty () ){
-			sb.append("[subject] ").append ( email.getSubject () ).append ( newline ).append ( newline );
+		if ( simpleMail.getSubject () != null && ! simpleMail.getSubject ().isEmpty () ){
+			sb.append("[subject] ").append ( simpleMail.getSubject () ).append ( newline ).append ( newline );
 		}
 			
-		if ( email.getAttachments () != null && !email.getAttachments ().isEmpty ()){
-			sb.append ( "[Attachement] " ).append(  IzMail.join ( email.getAttachments (), " , " ) ).append ( newline );
+		if ( simpleMail.getAttachments () != null && !simpleMail.getAttachments ().isEmpty ()){
+			sb.append ( "[Attachement] " ).append(  Email.join(simpleMail.getAttachments(), " , ") ).append(newline);
 		}
 		
-		if ( email.getEmbeddedImages () != null && ! email.getEmbeddedImages ().isEmpty () ) {
-			sb.append ( "[Embedded images] " ).append(  IzMail.join ( email.getEmbeddedImages (), " , " ) ).append ( newline );
+		if ( simpleMail.getEmbeddedImages () != null && ! simpleMail.getEmbeddedImages ().isEmpty () ) {
+			sb.append ( "[Embedded images] " ).append(  Email.join(simpleMail.getEmbeddedImages(), " , ") ).append(newline);
 		} 
 		
 		sb.append(newline);
 		
-		if ( email.getText () != null && ! email.getText ().isEmpty () ){
-			sb.append("[Text] ").append ( email.getText () ).append ( newline ).append ( newline );
+		if ( simpleMail.getText () != null && ! simpleMail.getText ().isEmpty () ){
+			sb.append("[Text] ").append ( simpleMail.getText () ).append ( newline ).append ( newline );
 		}
-		if ( email.getTextHTML () != null && ! email.getTextHTML ().isEmpty () ){
-			sb.append("[Html] ").append ( email.getTextHTML () ).append ( newline ).append ( newline );
+		if ( simpleMail.getTextHTML () != null && ! simpleMail.getTextHTML ().isEmpty () ){
+			sb.append("[Html] ").append ( simpleMail.getTextHTML () ).append ( newline ).append ( newline );
 		}
 		return sb.toString ();
 	}

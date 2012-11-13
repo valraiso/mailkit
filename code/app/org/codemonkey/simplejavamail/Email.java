@@ -17,7 +17,7 @@ import javax.mail.util.ByteArrayDataSource;
  */
 public class Email {
 	/**
-	 * The sender of the email. Can be used in conjunction with {@link #replyToRecipient}.
+	 * The sender of the simpleMail. Can be used in conjunction with {@link #replyToRecipient}.
 	 */
 	private Recipient fromRecipient;
 	/**
@@ -26,17 +26,17 @@ public class Email {
 	private Recipient replyToRecipient;
 
 	/**
-	 * The email message body in plain text.
+	 * The simpleMail message body in plain text.
 	 */
 	private String text;
 
 	/**
-	 * The email message body in html.
+	 * The simpleMail message body in html.
 	 */
 	private String textHTML;
 
 	/**
-	 * The subject of the email message.
+	 * The subject of the simpleMail message.
 	 */
 	private String subject;
 
@@ -74,7 +74,7 @@ public class Email {
 	 * Sets the sender address.
 	 * 
 	 * @param name The sender's name.
-	 * @param fromAddress The sender's email address.
+	 * @param fromAddress The sender's simpleMail address.
 	 */
 	public void setFromAddress(final String name, final String fromAddress) {
 		fromRecipient = new Recipient(name, fromAddress, null);
@@ -84,7 +84,7 @@ public class Email {
 	 * Sets the reply-to address (optional).
 	 * 
 	 * @param name The replied-to-receiver name.
-	 * @param replyToAddress The replied-to-receiver email address.
+	 * @param replyToAddress The replied-to-receiver simpleMail address.
 	 */
 	public void setReplyToAddress(final String name, final String replyToAddress) {
 		replyToRecipient = new Recipient(name, replyToAddress, null);
@@ -126,7 +126,7 @@ public class Email {
 	}
 
 	/**
-	 * Adds an embedded image (attachment type) to the email message and generates the necessary {@link DataSource} with the given byte
+	 * Adds an embedded image (attachment type) to the simpleMail message and generates the necessary {@link DataSource} with the given byte
 	 * data. Then delegates to {@link #addEmbeddedImage(String, DataSource)}. At this point the datasource is actually a
 	 * {@link ByteArrayDataSource}.
 	 * 
@@ -155,7 +155,7 @@ public class Email {
 	/**
 	 * Adds a header to the {@link #headers} list. The value is stored as a <code>String</code>.
 	 * <p>
-	 * example: <code>email.addHeader("X-Priority", 2)</code>
+	 * example: <code>simpleMail.addHeader("X-Priority", 2)</code>
 	 * 
 	 * @param name The name of the header.
 	 * @param value The value of the header, which will be stored using {@link String#valueOf(Object)}.
@@ -165,7 +165,7 @@ public class Email {
 	}
 
 	/**
-	 * Adds an attachment to the email message and generates the necessary {@link DataSource} with the given byte data. Then delegates to
+	 * Adds an attachment to the simpleMail message and generates the necessary {@link DataSource} with the given byte data. Then delegates to
 	 * {@link #addAttachment(String, DataSource)}. At this point the datasource is actually a {@link ByteArrayDataSource}.
 	 * 
 	 * @param name The name of the extension (eg. filename including extension).

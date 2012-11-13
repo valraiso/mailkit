@@ -34,7 +34,7 @@ import play.Logger;
  * The e-mail message structure is built to work with all e-mail clients and has been tested with many different webclients as well as some
  * mainstream client applications such as MS Outlook or Mozilla Thunderbird.<br />
  * <br />
- * Technically, the resulting email structure is as follows:<br />
+ * Technically, the resulting simpleMail structure is as follows:<br />
  * 
  * <pre>
  * - root
@@ -50,15 +50,15 @@ import play.Logger;
  * Usage example:<br />
  * 
  * <pre>
- * Email email = new Email();
- * email.setFromAddress(&quot;lollypop&quot;, &quot;lolly.pop@somemail.com&quot;);
- * email.addRecipient(&quot;Sugar Cane&quot;, &quot;sugar.cane@candystore.org&quot;, RecipientType.TO);
- * email.setText(&quot;We should meet up!!&quot;);
- * email.setTextHTML(&quot;&lt;b&gt;We should meet up!&lt;/b&gt;&quot;);
- * email.setSubject(&quot;Hey&quot;);
- * new Mailer(preconfiguredMailSession).sendMail(email);
+ * Email simpleMail = new Email();
+ * simpleMail.setFromAddress(&quot;lollypop&quot;, &quot;lolly.pop@somemail.com&quot;);
+ * simpleMail.addRecipient(&quot;Sugar Cane&quot;, &quot;sugar.cane@candystore.org&quot;, RecipientType.TO);
+ * simpleMail.setText(&quot;We should meet up!!&quot;);
+ * simpleMail.setTextHTML(&quot;&lt;b&gt;We should meet up!&lt;/b&gt;&quot;);
+ * simpleMail.setSubject(&quot;Hey&quot;);
+ * new Mailer(preconfiguredMailSession).sendMail(simpleMail);
  * // or:
- * new Mailer(&quot;smtp.someserver.com&quot;, 25, &quot;username&quot;, &quot;password&quot;).sendMail(email);
+ * new Mailer(&quot;smtp.someserver.com&quot;, 25, &quot;username&quot;, &quot;password&quot;).sendMail(simpleMail);
  * </pre>
  * 
  * @author Benny Bottema
@@ -69,12 +69,12 @@ public class Mailer {
 
 	
 	/**
-	 * Encoding used for setting body text, email address, headers, reply-to fields etc. ({@value #CHARACTER_ENCODING}).
+	 * Encoding used for setting body text, simpleMail address, headers, reply-to fields etc. ({@value #CHARACTER_ENCODING}).
 	 */
 	private static final String CHARACTER_ENCODING = "UTF-8";
 
 	/**
-	 * Used to actually send the email. This session can come from being passed in the default constructor, or made by <code>Mailer</code>
+	 * Used to actually send the simpleMail. This session can come from being passed in the default constructor, or made by <code>Mailer</code>
 	 * directly, when no <code>Session</code> instance was provided.
 	 * 
 	 * @see #Mailer(Session)
@@ -99,7 +99,7 @@ public class Mailer {
 	 * Default constructor, stores the given mail session for later use. Assumes that *all* properties used to make a connection are
 	 * configured (host, port, authentication and transport protocol settings).
 	 * <p>
-	 * Also defines a default email address validation criteria object, which remains true to RFC 2822, meaning allowing both domain
+	 * Also defines a default simpleMail address validation criteria object, which remains true to RFC 2822, meaning allowing both domain
 	 * literals and quoted identifiers (see {@link EmailAddressValidationCriteria#EmailAddressValidationCriteria(boolean, boolean)}).
 	 * 
 	 * @param session A preconfigured mail {@link Session} object with which a {@link Message} can be produced.
@@ -113,7 +113,7 @@ public class Mailer {
 	 * Overloaded constructor which produces a new {@link Session} on the fly. Use this if you don't have a mail session configured in your
 	 * web container, or Spring context etc.
 	 * <p>
-	 * Also defines a default email address validation criteria object, which remains true to RFC 2822, meaning allowing both domain
+	 * Also defines a default simpleMail address validation criteria object, which remains true to RFC 2822, meaning allowing both domain
 	 * literals and quoted identifiers (see {@link EmailAddressValidationCriteria#EmailAddressValidationCriteria(boolean, boolean)}).
 	 * 
 	 * @param host The address URL of the SMTP server to be used.
@@ -216,8 +216,8 @@ public class Mailer {
 	 * Performs a call to {@link Message#saveChanges()} as the Sun JavaMail API indicates it is needed to configure the message headers and
 	 * providing a message id.
 	 * 
-	 * @param email The information for the email to be sent.
-	 * @throws MailException Can be thrown if an email isn't validating correctly, or some other problem occurs during connection, sending
+	 * @param email The information for the simpleMail to be sent.
+	 * @throws MailException Can be thrown if an simpleMail isn't validating correctly, or some other problem occurs during connection, sending
 	 *             etc.
 	 * @see #validate(Email)
 	 * @see #prepareMessage(Email, MimeEmailMessageWrapper)
@@ -264,7 +264,7 @@ public class Mailer {
 	/**
 	 * Validates an {@link Email} instance. Validation fails if the subject is missing, content is missing, or no recipients are defined.
 	 * 
-	 * @param email The email that needs to be configured correctly.
+	 * @param email The simpleMail that needs to be configured correctly.
 	 * @return Always <code>true</code> (throws a {@link MailException} exception if validation fails).
 	 * @throws MailException Is being thrown in any of the above causes.
 	 * @see EmailValidationUtil
@@ -298,12 +298,12 @@ public class Mailer {
 	}
 
 	/**
-	 * Creates a new {@link MimeMessage} instance and prepares it in the email structure, so that it can be filled and send.
+	 * Creates a new {@link MimeMessage} instance and prepares it in the simpleMail structure, so that it can be filled and send.
 	 * <p>
 	 * Fills subject, from,reply-to, content, sent-date, recipients, texts, embedded images, attachments, content and adds all headers.
 	 * 
-	 * @param email The email message from which the subject and From-address are extracted.
-	 * @param messageRoot The root of the email which holds everything (filled with some email data).
+	 * @param email The simpleMail message from which the subject and From-address are extracted.
+	 * @param messageRoot The root of the simpleMail which holds everything (filled with some simpleMail data).
 	 * @return A fully preparated {@link Message} instance, ready to be sent.
 	 * @throws MessagingException Kan gegooid worden als het message niet goed behandelt wordt.
 	 * @throws UnsupportedEncodingException Zie {@link InternetAddress#InternetAddress(String, String)}.
@@ -311,7 +311,7 @@ public class Mailer {
 	private Message prepareMessage(final Email email, final MimeEmailMessageWrapper messageRoot)
 			throws MessagingException, UnsupportedEncodingException {
 		final MimeMessage message = new MimeMessage(session);
-		// set basic email properties
+		// set basic simpleMail properties
 		message.setSubject(email.getSubject(), CHARACTER_ENCODING);
 		message.setFrom(new InternetAddress(email.getFromRecipient().getAddress(), email.getFromRecipient().getName(), CHARACTER_ENCODING));
 		setReplyTo(email, message);
@@ -385,7 +385,7 @@ public class Mailer {
 	 * Fills the {@link Message} instance with the embedded images from the {@link Email}.
 	 * 
 	 * @param email The message in which the embedded images are defined.
-	 * @param multipartRelated The branch in the email structure in which we'll stuff the embedded images.
+	 * @param multipartRelated The branch in the simpleMail structure in which we'll stuff the embedded images.
 	 * @throws MessagingException See {@link MimeMultipart#addBodyPart(BodyPart)} and
 	 *             {@link #getBodyPartFromDatasource(AttachmentResource, String)}
 	 */
@@ -400,7 +400,7 @@ public class Mailer {
 	 * Fills the {@link Message} instance with the attachments from the {@link Email}.
 	 * 
 	 * @param email The message in which the attachments are defined.
-	 * @param multipartRoot The branch in the email structure in which we'll stuff the attachments.
+	 * @param multipartRoot The branch in the simpleMail structure in which we'll stuff the attachments.
 	 * @throws MessagingException See {@link MimeMultipart#addBodyPart(BodyPart)} and
 	 *             {@link #getBodyPartFromDatasource(AttachmentResource, String)}
 	 */
@@ -436,13 +436,13 @@ public class Mailer {
 	/**
 	 * Helper method which generates a {@link BodyPart} from an {@link AttachmentResource} (from its {@link DataSource}) and a disposition
 	 * type ({@link Part#INLINE} or {@link Part#ATTACHMENT}). With this the attachment data can be converted into objects that fit in the
-	 * email structure. <br />
+	 * simpleMail structure. <br />
 	 * <br />
 	 * For every attachment and embedded image a header needs to be set.
 	 * 
 	 * @param resource An object that describes the attachment and contains the actual content data.
 	 * @param dispositionType The type of attachment, {@link Part#INLINE} or {@link Part#ATTACHMENT} .
-	 * @return An object with the attachment data read for placement in the email structure.
+	 * @return An object with the attachment data read for placement in the simpleMail structure.
 	 * @throws MessagingException All BodyPart setters.
 	 */
 	private BodyPart getBodyPartFromDatasource(final AttachmentResource resource, final String dispositionType)
@@ -462,7 +462,7 @@ public class Mailer {
 	 * This class conveniently wraps all necessary mimemessage parts that need to be filled with content, attachments etc. The root is
 	 * ultimately sent using JavaMail.<br />
 	 * <br />
-	 * The constructor creates a new email message constructed from {@link MimeMultipart} as follows:
+	 * The constructor creates a new simpleMail message constructed from {@link MimeMultipart} as follows:
 	 * 
 	 * <pre>
 	 * - root
@@ -485,7 +485,7 @@ public class Mailer {
 		private final MimeMultipart multipartAlternativeMessages;
 
 		/**
-		 * Creates an email skeleton structure, so that embedded images, attachments and (html) texts are being processed properly.
+		 * Creates an simpleMail skeleton structure, so that embedded images, attachments and (html) texts are being processed properly.
 		 */
 		MimeEmailMessageWrapper() {
 			multipartRoot = new MimeMultipart("mixed");
@@ -507,7 +507,7 @@ public class Mailer {
 	}
 
 	/**
-	 * Overrides the default email address validation restrictions when validating and sending emails using the current <code>Mailer</code>
+	 * Overrides the default simpleMail address validation restrictions when validating and sending emails using the current <code>Mailer</code>
 	 * instance.
 	 * 
 	 * @param emailAddressValidationCriteria Refer to
