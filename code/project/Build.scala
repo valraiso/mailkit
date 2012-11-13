@@ -8,7 +8,6 @@ object ApplicationBuild extends Build {
     val appVersion      = "1.0-SNAPSHOT"
 
     val appDependencies = Seq(
-          javaCore,
     	  "javax.activation" % "activation" % "1.1-rev-1",
     	  "javax.mail" % "mailapi" % "1.4.3",
     	  "com.sun.mail" % "smtp" % "1.4.4",
@@ -20,10 +19,9 @@ object ApplicationBuild extends Build {
     val valraisoRepository = if(appVersion.endsWith("SNAPSHOT")) valraisoSnapshots else valraisoReleases
 
 
-    val main = play.Project(appName, appVersion, appDependencies).settings(
+    val main = PlayProject(appName, appVersion, appDependencies).settings(
         organization := "valraiso",
         publishMavenStyle := true,
-        playPlugin:=true,
         publishTo := Some(valraisoRepository)
     )
 

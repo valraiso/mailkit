@@ -19,7 +19,7 @@ import javax.mail.Message.RecipientType;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.codemonkey.simplejavamail.Recipient;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -408,7 +408,7 @@ public class Email {
 		
 		String text = html.replaceAll("<\\s*/?br\\s*>", "\n") // replace all <br/> by newline 
 						  .replaceAll("<.*?>", ""); // strip all html tags
-		text(StringEscapeUtils.unescapeHtml4(text));
+		text(StringEscapeUtils.unescapeHtml(text));
 		return this;
 	}
 	
