@@ -1,1 +1,1 @@
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET     /fake/route               mailkit.FakeController.fakeAction()

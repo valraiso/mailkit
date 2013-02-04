@@ -3,7 +3,7 @@ package controllers;
 import mailkit.Email;
 import play.mvc.Controller;
 import play.mvc.Result;
-
+import views.html.*;
 public class Application extends Controller {
   
   public static Result index() throws Exception {
@@ -16,6 +16,6 @@ public class Application extends Controller {
 	  email.attach ( "http://www.playframework.org/assets/images/logo.png" );
 	  email.html ( "<body><p>Simple test <img src=\"/assets/images/favicon.png\"/></p></body>" ).send ();
 	  
-    return ok("It works!");
+    return ok(index.render("Your new application is ready."));
   }
 }

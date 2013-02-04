@@ -20,6 +20,7 @@ object ApplicationBuild extends Build {
       	  "org.jsoup" % "jsoup" % "1.6.3"
       ), path=file("modules/mailkit")).settings(
     	  organization := "valraiso"
+        ,playPlugin:=true
     )
 
     val main = play.Project(appName, appVersion, appDependencies).settings(

@@ -5,7 +5,7 @@ import PlayProject._
 object ApplicationBuild extends Build {
 
     val appName         = "mailkit"
-    val appVersion      = "1.0-SNAPSHOT"
+    val appVersion      = "0.1"
 
     val appDependencies = Seq(
           javaCore,
@@ -22,7 +22,7 @@ object ApplicationBuild extends Build {
 
     val main = play.Project(appName, appVersion, appDependencies).settings(
         organization := "valraiso",
-        publishMavenStyle := true,
+        //publishMavenStyle := true,
         playPlugin:=true,
         publishTo := Some(valraisoRepository)
     )
