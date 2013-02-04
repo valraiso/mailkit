@@ -1,11 +1,11 @@
 import sbt._
 import Keys._
-import PlayProject._
+import play.Project._
 
 object ApplicationBuild extends Build {
 
     val appName         = "mailkit"
-    val appVersion      = "1.0-SNAPSHOT"
+    val appVersion      = "1.0"
 
     val appDependencies = Seq(
           javaCore,
@@ -15,8 +15,8 @@ object ApplicationBuild extends Build {
           "org.jsoup" % "jsoup" % "1.7.1"
     )
 
-    val valraisoReleases   = Resolver.file("file", new File(Path.userHome.absolutePath+"/dev/apps/valraiso.github.com/releases/"))
-    val valraisoSnapshots  = Resolver.file("file", new File(Path.userHome.absolutePath+"/dev/apps/valraiso.github.com/snapshot/"))
+    val valraisoReleases   = Resolver.file("file", new File("../../valraiso.github.com/releases/"))
+    val valraisoSnapshots  = Resolver.file("file", new File("../../valraiso.github.com/snapshot/"))
     val valraisoRepository = if(appVersion.endsWith("SNAPSHOT")) valraisoSnapshots else valraisoReleases
 
 
